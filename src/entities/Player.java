@@ -10,11 +10,15 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList; 
 
 import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
 import utilz.LoadSave;
+
+// Import Arrow từ package entities (vì file bạn gửi nằm ở entities)
+import objects.Arrow; 
 
 public class Player extends Entity {
 
@@ -22,27 +26,21 @@ public class Player extends Entity {
     private boolean moving = false, attacking = false;
     private boolean left, right, jump;
     private int[][] lvlData;
-//    private float xDrawOffset = 21 * Game.SCALE;
-//    private float yDrawOffset = 4 * Game.SCALE;
 
-    // Jumping / Gravity
     private float jumpSpeed = -2.25f * Game.SCALE;
     private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
-    // StatusBarUI
+    // UI Variables
     private BufferedImage statusBarImg;
-
     private int statusBarWidth = (int) (192 * Game.SCALE);
     private int statusBarHeight = (int) (58 * Game.SCALE);
     private int statusBarX = (int) (10 * Game.SCALE);
     private int statusBarY = (int) (10 * Game.SCALE);
-
     private int healthBarWidth = (int) (150 * Game.SCALE);
     private int healthBarHeight = (int) (4 * Game.SCALE);
     private int healthBarXStart = (int) (34 * Game.SCALE);
     private int healthBarYStart = (int) (14 * Game.SCALE);
     private int healthWidth = healthBarWidth;
-
     private int powerBarWidth = (int) (104 * Game.SCALE);
     private int powerBarHeight = (int) (2 * Game.SCALE);
     private int powerBarXStart = (int) (44 * Game.SCALE);
@@ -53,12 +51,9 @@ public class Player extends Entity {
 
     private int flipX = 0;
     private int flipW = 1;
-
     private boolean attackChecked;
     private Playing playing;
-
     private int tileY = 0;
-
     private boolean powerAttackActive;
     private int powerAttackTick;
     private int powerGrowSpeed = 15;
@@ -66,6 +61,9 @@ public class Player extends Entity {
 
     private final PlayerCharacter playerCharacter;
 
+    // --- DANH SÁCH MŨI TÊN (QUẢN LÝ TẠI ĐÂY) ---
+    private ArrayList<Arrow> arrows = new ArrayList<>();
+    
     public Player(PlayerCharacter playerCharacter, Playing playing) {
         super(0, 0, (int) (playerCharacter.spriteW * Game.SCALE), (int) (playerCharacter.spriteH * Game.SCALE));
         this.playerCharacter = playerCharacter;
@@ -103,8 +101,6 @@ public class Player extends Entity {
                 aniIndex = 0;
                 playing.setPlayerDying(true);
                 playing.getGame().getAudioPlayer().playEffect(AudioPlayer.DIE);
-
-                // Check if player died in air
                 if (!IsEntityOnFloor(hitbox, lvlData)) {
                     inAir = true;
                     airSpeed = 0;
@@ -115,17 +111,13 @@ public class Player extends Entity {
                 playing.getGame().getAudioPlayer().playEffect(AudioPlayer.GAMEOVER);
             } else {
                 updateAnimationTick();
-
-                // Fall if in air
                 if (inAir)
                     if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
                         hitbox.y += airSpeed;
                         airSpeed += GRAVITY;
                     } else
                         inAir = false;
-
             }
-
             return;
         }
 
@@ -157,7 +149,59 @@ public class Player extends Entity {
 
         updateAnimationTick();
         setAnimation();
+        
+        // --- CẬP NHẬT MŨI TÊN ---
+        updateArrows(lvlData);
     }
+
+    // --- HÀM QUAN TRỌNG: CHECK ATTACK ---
+    private void checkAttack() {
+        if (attackChecked || aniIndex != 1)
+            return;
+        attackChecked = true;
+
+        if (powerAttackActive)
+            attackChecked = false;
+
+        // LOGIC BẮN TÊN (SOLDIER)
+        if (playerCharacter == PlayerCharacter.SOLDIER) {
+            // Xác định hướng dựa trên flipW
+            int dir = 1;
+            if (flipW == -1) dir = -1;
+            
+            // Thêm mũi tên vào danh sách của Player
+            // Y + 5 * SCALE để khớp với tay súng
+            arrows.add(new Arrow(hitbox.x, hitbox.y + (5 * Game.SCALE), dir));
+        } else {
+            // Các nhân vật khác đánh cận chiến
+            playing.checkEnemyHit(attackBox);
+            playing.checkObjectHit(attackBox);
+        }
+        
+        playing.getGame().getAudioPlayer().playAttackSound();
+    }
+    
+    // --- QUẢN LÝ ARROW ---
+    private void updateArrows(int[][] lvlData) {
+        for (Arrow a : arrows) {
+            if (a.isActive()) {
+                a.update(lvlData);
+            }
+        }
+    }
+
+    private void drawArrows(Graphics g, int xLvlOffset) {
+        for (Arrow a : arrows) {
+            if (a.isActive()) {
+                a.render(g, xLvlOffset);
+            }
+        }
+    }
+    
+    public ArrayList<Arrow> getArrows() {
+        return arrows;
+    }
+    // ---------------------
 
     private void checkInsideWater() {
         if (IsEntityInWater(hitbox, playing.getLevelManager().getCurrentLevel().getLevelData()))
@@ -172,19 +216,6 @@ public class Player extends Entity {
         playing.checkPotionTouched(hitbox);
     }
 
-    private void checkAttack() {
-        if (attackChecked || aniIndex != 1)
-            return;
-        attackChecked = true;
-
-        if (powerAttackActive)
-            attackChecked = false;
-
-        playing.checkEnemyHit(attackBox);
-        playing.checkObjectHit(attackBox);
-        playing.getGame().getAudioPlayer().playAttackSound();
-    }
-
     private void setAttackBoxOnRightSide() {
         attackBox.x = hitbox.x + hitbox.width - (int) (Game.SCALE * 5);
     }
@@ -193,19 +224,21 @@ public class Player extends Entity {
         attackBox.x = hitbox.x - hitbox.width - (int) (Game.SCALE * 10);
     }
 
+    private void resetAttackBox() {
+        if (flipW == 1)
+            setAttackBoxOnRightSide();
+        else
+            setAttackBoxOnLeftSide();
+    }
+
     private void updateAttackBox() {
         if (right && left) {
-            if (flipW == 1) {
-                setAttackBoxOnRightSide();
-            } else {
-                setAttackBoxOnLeftSide();
-            }
-
+            if (flipW == 1) setAttackBoxOnRightSide();
+            else setAttackBoxOnLeftSide();
         } else if (right || (powerAttackActive && flipW == 1))
             setAttackBoxOnRightSide();
         else if (left || (powerAttackActive && flipW == -1))
             setAttackBoxOnLeftSide();
-
         attackBox.y = hitbox.y + (Game.SCALE * 10);
     }
 
@@ -225,19 +258,17 @@ public class Player extends Entity {
     public void render(Graphics g, int lvlOffset) {
         g.drawImage(animations[playerCharacter.getRowIndex(state)][aniIndex], (int) (hitbox.x - playerCharacter.xDrawOffset) - lvlOffset + flipX, (int) (hitbox.y - playerCharacter.yDrawOffset + (int) (pushDrawOffset)), width * flipW, height, null);
         drawHitbox(g, lvlOffset);
-//		drawAttackBox(g, lvlOffset);
+        
+        // VẼ MŨI TÊN
+        drawArrows(g, lvlOffset);
+        
         drawUI(g);
     }
 
     private void drawUI(Graphics g) {
-        // Background ui
         g.drawImage(statusBarImg, statusBarX, statusBarY, statusBarWidth, statusBarHeight, null);
-
-        // Health bar
         g.setColor(Color.red);
         g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
-
-        // Power Bar
         g.setColor(Color.yellow);
         g.fillRect(powerBarXStart + statusBarX, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
     }
@@ -263,29 +294,19 @@ public class Player extends Entity {
 
     private void setAnimation() {
         int startAni = state;
-
-        if (state == HIT)
-            return;
-
-        if (moving)
-            state = RUNNING;
-        else
-            state = IDLE;
-
+        if (state == HIT) return;
+        if (moving) state = RUNNING;
+        else state = IDLE;
         if (inAir) {
-            if (airSpeed < 0)
-                state = JUMP;
-            else
-                state = FALLING;
+            if (airSpeed < 0) state = JUMP;
+            else state = FALLING;
         }
-
         if (powerAttackActive) {
             state = ATTACK;
             aniIndex = 1;
             aniTick = 0;
             return;
         }
-
         if (attacking) {
             state = ATTACK;
             if (startAni != ATTACK) {
@@ -294,8 +315,7 @@ public class Player extends Entity {
                 return;
             }
         }
-        if (startAni != state)
-            resetAniTick();
+        if (startAni != state) resetAniTick();
     }
 
     private void resetAniTick() {
@@ -304,66 +324,68 @@ public class Player extends Entity {
     }
 
     private void updatePos() {
-        moving = false;
+		moving = false;
 
-        if (jump)
-            jump();
+		if (jump)
+			jump();
 
-        if (!inAir)
-            if (!powerAttackActive)
-                if ((!left && !right) || (right && left))
-                    return;
+		if (!inAir)
+			if (!powerAttackActive)
+				// Nếu không di chuyển
+				if ((!left && !right) || (right && left))
+					// --- FIX LỖI ĐƠ KHI ĐỨNG YÊN ---
+					// Nếu đang tấn công thì KHÔNG được return, phải chạy tiếp để xử lý bắn
+					if (!attacking) 
+						return;
 
-        float xSpeed = 0;
+		float xSpeed = 0;
 
-        if (left && !right) {
-            xSpeed -= walkSpeed;
-            flipX = width;
-            flipW = -1;
-        }
-        if (right && !left) {
-            xSpeed += walkSpeed;
-            flipX = 0;
-            flipW = 1;
-        }
+		// ... (Phần còn lại bên dưới giữ nguyên như file gốc của bạn)
+		if (left && !right) {
+			xSpeed -= walkSpeed;
+			flipX = width;
+			flipW = -1;
+		}
+		if (right && !left) {
+			xSpeed += walkSpeed;
+			flipX = 0;
+			flipW = 1;
+		}
 
-        if (powerAttackActive) {
-            if ((!left && !right) || (left && right)) {
-                if (flipW == -1)
-                    xSpeed = -walkSpeed;
-                else
-                    xSpeed = walkSpeed;
-            }
+		if (powerAttackActive) {
+			if ((!left && !right) || (left && right)) {
+				if (flipW == -1)
+					xSpeed = -walkSpeed;
+				else
+					xSpeed = walkSpeed;
+			}
+			xSpeed *= 3;
+		}
 
-            xSpeed *= 3;
-        }
+		if (!inAir)
+			if (!IsEntityOnFloor(hitbox, lvlData))
+				inAir = true;
 
-        if (!inAir)
-            if (!IsEntityOnFloor(hitbox, lvlData))
-                inAir = true;
-
-        if (inAir && !powerAttackActive) {
-            if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
-                hitbox.y += airSpeed;
-                airSpeed += GRAVITY;
-                updateXPos(xSpeed);
-            } else {
-                hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
-                if (airSpeed > 0)
-                    resetInAir();
-                else
-                    airSpeed = fallSpeedAfterCollision;
-                updateXPos(xSpeed);
-            }
-
-        } else
-            updateXPos(xSpeed);
-        moving = true;
-    }
+		if (inAir && !powerAttackActive) {
+			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
+				hitbox.y += airSpeed;
+				airSpeed += GRAVITY;
+				updateXPos(xSpeed);
+			} else {
+				hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
+				if (airSpeed > 0)
+					resetInAir();
+				else
+					airSpeed = fallSpeedAfterCollision;
+				updateXPos(xSpeed);
+			}
+		} else
+			updateXPos(xSpeed);
+		moving = true;
+	}
 
     private void jump() {
-        if (inAir)
-            return;
+        if (inAir) return;
         playing.getGame().getAudioPlayer().playEffect(AudioPlayer.JUMP);
         inAir = true;
         airSpeed = jumpSpeed;
@@ -388,74 +410,39 @@ public class Player extends Entity {
 
     public void changeHealth(int value) {
         if (value < 0) {
-            if (state == HIT)
-                return;
-            else
-                newState(HIT);
+            if (state == HIT) return;
+            else newState(HIT);
         }
-
         currentHealth += value;
         currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
     }
 
     public void changeHealth(int value, Enemy e) {
-        if (state == HIT)
-            return;
+        if (state == HIT) return;
         changeHealth(value);
         pushBackOffsetDir = UP;
         pushDrawOffset = 0;
-
-        if (e.getHitbox().x < hitbox.x)
-            pushBackDir = RIGHT;
-        else
-            pushBackDir = LEFT;
+        if (e.getHitbox().x < hitbox.x) pushBackDir = RIGHT;
+        else pushBackDir = LEFT;
     }
 
-    public void kill() {
-        currentHealth = 0;
-    }
-
+    public void kill() { currentHealth = 0; }
     public void changePower(int value) {
         powerValue += value;
         powerValue = Math.max(Math.min(powerValue, powerMaxValue), 0);
     }
-
-
     public void loadLvlData(int[][] lvlData) {
         this.lvlData = lvlData;
-        if (!IsEntityOnFloor(hitbox, lvlData))
-            inAir = true;
+        if (!IsEntityOnFloor(hitbox, lvlData)) inAir = true;
     }
-
-    public void resetDirBooleans() {
-        left = false;
-        right = false;
-    }
-
-    public void setAttacking(boolean attacking) {
-        this.attacking = attacking;
-    }
-
-    public boolean isLeft() {
-        return left;
-    }
-
-    public void setLeft(boolean left) {
-        this.left = left;
-    }
-
-    public boolean isRight() {
-        return right;
-    }
-
-    public void setRight(boolean right) {
-        this.right = right;
-    }
-
-    public void setJump(boolean jump) {
-        this.jump = jump;
-    }
-
+    public void resetDirBooleans() { left = false; right = false; }
+    public void setAttacking(boolean attacking) { this.attacking = attacking; }
+    public boolean isLeft() { return left; }
+    public void setLeft(boolean left) { this.left = left; }
+    public boolean isRight() { return right; }
+    public void setRight(boolean right) { this.right = right; }
+    public void setJump(boolean jump) { this.jump = jump; }
+    
     public void resetAll() {
         resetDirBooleans();
         inAir = false;
@@ -467,34 +454,23 @@ public class Player extends Entity {
         powerAttackActive = false;
         powerAttackTick = 0;
         powerValue = powerMaxValue;
+        
+        arrows.clear(); // Xóa đạn khi reset
 
         hitbox.x = x;
         hitbox.y = y;
         resetAttackBox();
-
-        if (!IsEntityOnFloor(hitbox, lvlData))
-            inAir = true;
+        if (!IsEntityOnFloor(hitbox, lvlData)) inAir = true;
     }
-
-    private void resetAttackBox() {
-        if (flipW == 1)
-            setAttackBoxOnRightSide();
-        else
-            setAttackBoxOnLeftSide();
-    }
-
-    public int getTileY() {
-        return tileY;
-    }
-
+    public int getTileY() { return tileY; }
     public void powerAttack() {
-        if (powerAttackActive)
-            return;
+        if (powerAttackActive) return;
         if (powerValue >= 60) {
             powerAttackActive = true;
             changePower(-60);
         }
-
     }
-
+    public boolean isSoldier() {
+        return this.playerCharacter == PlayerCharacter.SOLDIER;
+    }
 }
