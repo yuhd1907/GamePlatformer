@@ -4,13 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7605987a-aa3c-418a-911f-d67cb9b05e78" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="7605987a-aa3c-418a-911f-d67cb9b05e78" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -25,6 +26,8 @@
     "Application.MainClass.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "chỉnh-sửa",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/84353/OneDrive/Documents/GitHub/GamePlatformer/res",
     "node.js.selected.package.tslint": "(autodetect)",
@@ -44,6 +47,7 @@
       <option name="ALTERNATIVE_JRE_PATH" value="24" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="main.MainClass" />
+      <module name="GamePlatformer" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.*" />
@@ -71,6 +75,7 @@
       <option name="presentableId" value="Default" />
       <updated>1764139346861</updated>
       <workItem from="1764139348365" duration="88000" />
+      <workItem from="1764186046270" duration="65000" />
     </task>
     <servers />
   </component>
