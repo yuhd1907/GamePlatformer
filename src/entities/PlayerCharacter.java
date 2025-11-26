@@ -7,10 +7,10 @@ import static utilz.Constants.PlayerConstants.*;
 
 public enum PlayerCharacter {
 
-    PIRATE(5, 6, 3, 1, 3, 4, 8,
-            0, 1, 2, 3, 4, 5, 6,
-            LoadSave.PLAYER_PIRATE, 7, 8, 64, 40,
-            20, 27, 21, 4),
+    PIRATE(7, 8, 5, 7, 6, 4, 12,
+            0, 1, 2, 1, 3, 4, 5,
+            LoadSave.PLAYER_PIRATE, 6, 12, 96, 84,
+            16, 33, 37, 25),
     ORC(6, 8, 8, 8, 6, 4, 4,
             0, 1, 1, 1, 2, 4, 5,
             LoadSave.PLAYER_ORC, 6, 8, 100, 100,
