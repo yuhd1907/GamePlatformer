@@ -8,7 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 import java.util.ArrayList;
-
+import objects.Arrow;
 import entities.EnemyManager;
 import entities.Player;
 import entities.PlayerCharacter;
@@ -58,16 +58,6 @@ public class Playing extends State implements Statemethods {
     private boolean playerDying;
     private boolean drawRain;
 
-    // Ship will be decided to drawn here. It's just a cool addition to the game
-    // for the first level. Hinting on that the player arrived with the boat.
-
-    // If you would like to have it on more levels, add a value for objects when
-    // creating the level from lvlImgs. Just like any other object.
-
-    // Then play around with position values so it looks correct depending on where
-    // you want
-    // it.
-
     private boolean drawShip = true;
     private int shipAni, shipTick, shipDir = 1;
     private float shipHeightDelta, shipHeightChange = 0.05f * Game.SCALE;
@@ -96,12 +86,6 @@ public class Playing extends State implements Statemethods {
 
     private void loadDialogue() {
         loadDialogueImgs();
-
-        // Load dialogue array with premade objects, that gets activated when needed.
-        // This is a simple
-        // way of avoiding ConcurrentModificationException error. (Adding to a list that
-        // is being looped through.
-
         for (int i = 0; i < 10; i++)
             dialogEffects.add(new DialogueEffect(0, 0, EXCLAMATION));
         for (int i = 0; i < 10; i++)
@@ -145,7 +129,6 @@ public class Playing extends State implements Statemethods {
         enemyManager = new EnemyManager(this);
         objectManager = new ObjectManager(this);
 
-
         pauseOverlay = new PauseOverlay(this);
         gameOverOverlay = new GameOverOverlay(this);
         levelCompletedOverlay = new LevelCompletedOverlay(this);
@@ -155,37 +138,43 @@ public class Playing extends State implements Statemethods {
     }
 
     public void setPlayerCharacter(PlayerCharacter pc) {
-
         player = new Player(pc, this);
         player.loadLvlData(levelManager.getCurrentLevel().getLevelData());
         player.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
     }
 
     @Override
-    public void update() {
-        if (paused)
-            pauseOverlay.update();
-        else if (lvlCompleted)
-            levelCompletedOverlay.update();
-        else if (gameCompleted)
-            gameCompletedOverlay.update();
-        else if (gameOver)
-            gameOverOverlay.update();
-        else if (playerDying)
-            player.update();
-        else {
-            updateDialogue();
-            if (drawRain)
-                rain.update(xLvlOffset);
-            levelManager.update();
-            objectManager.update(levelManager.getCurrentLevel().getLevelData(), player);
-            player.update();
-            enemyManager.update(levelManager.getCurrentLevel().getLevelData());
-            checkCloseToBorder();
-            if (drawShip)
-                updateShipAni();
-        }
+public void update() {
+    if (paused)
+        pauseOverlay.update();
+    else if (lvlCompleted)
+        levelCompletedOverlay.update();
+    else if (gameCompleted)
+        gameCompletedOverlay.update();
+    else if (gameOver)
+        gameOverOverlay.update();
+    else if (playerDying)
+        player.update();
+    else {
+        updateDialogue();
+        if (drawRain)
+            rain.update(xLvlOffset);
+        levelManager.update();
+        objectManager.update(levelManager.getCurrentLevel().getLevelData(), player);
+        player.update();
+        enemyManager.update(levelManager.getCurrentLevel().getLevelData());
+        
+        // --- BƯỚC 1: KIỂM TRA MŨI TÊN TRÚNG QUÁI ---
+        enemyManager.checkEnemyHit(player.getArrows());
+
+        // --- BƯỚC 2: KIỂM TRA MŨI TÊN TRÚNG HỘP/THÙNG (MỚI THÊM) ---
+        objectManager.checkObjectHit(player.getArrows());
+
+        checkCloseToBorder();
+        if (drawShip)
+            updateShipAni();
     }
+}
 
     private void updateShipAni() {
         shipTick++;
@@ -203,7 +192,6 @@ public class Playing extends State implements Statemethods {
             shipDir = 1;
         else if (shipHeightDelta == 10 * Game.SCALE)
             shipDir = -1;
-
     }
 
     private void updateDialogue() {
@@ -223,7 +211,6 @@ public class Playing extends State implements Statemethods {
     }
 
     public void addDialogue(int x, int y, int type) {
-        // Not adding a new one, we are recycling. #ThinkGreen lol
         dialogEffects.add(new DialogueEffect(x, y - (int) (Game.SCALE * 15), type));
         for (DialogueEffect de : dialogEffects)
             if (!de.isActive())
@@ -308,7 +295,6 @@ public class Playing extends State implements Statemethods {
     }
 
     private void setDrawRainBoolean() {
-        // This method makes it rain 20% of the time you load a level.
         if (rnd.nextFloat() >= 0.8f)
             drawRain = true;
     }
@@ -336,10 +322,16 @@ public class Playing extends State implements Statemethods {
     @Override
     public void mouseClicked(MouseEvent e) {
         if (!gameOver) {
-            if (e.getButton() == MouseEvent.BUTTON1)
+            // NẾU BẤM CHUỘT TRÁI
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                // CHỈ CẦN DÒNG NÀY LÀ ĐỦ
+                // Player.java sẽ tự kiểm tra: Nếu là Soldier -> Bắn tên, Khác -> Chém
                 player.setAttacking(true);
-            else if (e.getButton() == MouseEvent.BUTTON3)
+            } 
+            // NẾU BẤM CHUỘT PHẢI
+            else if (e.getButton() == MouseEvent.BUTTON3) {
                 player.powerAttack();
+            }
         }
     }
 
@@ -351,7 +343,6 @@ public class Playing extends State implements Statemethods {
                     player.setLeft(true);
                     break;
                 case KeyEvent.VK_D:
-
                     player.setRight(true);
                     break;
                 case KeyEvent.VK_SPACE:
@@ -359,6 +350,7 @@ public class Playing extends State implements Statemethods {
                     break;
                 case KeyEvent.VK_ESCAPE:
                     paused = !paused;
+                    break;
             }
     }
 
@@ -394,7 +386,6 @@ public class Playing extends State implements Statemethods {
             levelCompletedOverlay.mousePressed(e);
         else if (gameCompleted)
             gameCompletedOverlay.mousePressed(e);
-
     }
 
     @Override
@@ -424,7 +415,6 @@ public class Playing extends State implements Statemethods {
     public void setLevelCompleted(boolean levelCompleted) {
         game.getAudioPlayer().lvlCompleted();
         if (levelManager.getLevelIndex() + 1 >= levelManager.getAmountOfLevels()) {
-            // No more levels
             gameCompleted = true;
             levelManager.setLevelIndex(0);
             levelManager.loadNextLevel();
@@ -465,6 +455,4 @@ public class Playing extends State implements Statemethods {
     public void setPlayerDying(boolean playerDying) {
         this.playerDying = playerDying;
     }
-
-
 }
