@@ -16,7 +16,11 @@ public class LoadSave {
 //    public static final String PLAYER_PIRATE = "player_sprites.png";
     public static final String PLAYER_PIRATE = "kiem.png";
     public static final String PLAYER_ORC = "player_orc.png";
+
 //    public static final String PLAYER_SOLDIER = "player_soldier.png";
+
+    // public static final String PLAYER_SOLDIER = "player_soldier.png";
+
     public static final String PLAYER_SOLDIER = "Untitled.png";
     public static final String LEVEL_ATLAS = "outside_sprites.png";
     public static final String MENU_BUTTONS = "button_atlas.png";
@@ -52,6 +56,7 @@ public class LoadSave {
     public static final String WATER_TOP = "water_atlas_animation.png";
     public static final String WATER_BOTTOM = "water.png";
     public static final String SHIP = "ship.png";
+    public static final String ARROW_SPRITE = "arrow.png";
 
 
     public static BufferedImage[][] loadAnimations(PlayerCharacter pc) {
