@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7605987a-aa3c-418a-911f-d67cb9b05e78" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/res/background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/res/BG1.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gamestates/Playing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gamestates/Playing.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utilz/LoadSave.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utilz/LoadSave.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,7 +34,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;chỉnh-sửa&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/84353/OneDrive/Documents/GitHub/GamePlatformer/res&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin/OneDrive/Documents/GitHub/GamePlatformer/res&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -46,6 +47,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Admin\OneDrive\Documents\GitHub\GamePlatformer\res" />
       <recent name="C:\Users\84353\OneDrive\Documents\GitHub\GamePlatformer\res" />
     </key>
   </component>
@@ -84,6 +86,7 @@
       <workItem from="1764139348365" duration="88000" />
       <workItem from="1764186046270" duration="611000" />
       <workItem from="1764187111395" duration="423000" />
+      <workItem from="1764239763194" duration="613000" />
     </task>
     <servers />
   </component>
