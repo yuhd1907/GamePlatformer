@@ -82,7 +82,7 @@ public class PlayerSelection extends State implements Statemethods {
         drawChar(g, playerIndex + 1, xRight, yCenter, 0.7f);
 
         // --- Vẽ con Ở GIỮA (To đùng: 1.6 - Vẽ sau cùng để đè lên trên) ---
-        drawChar(g, playerIndex, xCenter, yCenter, 1.6f);
+        drawChar(g, playerIndex, xCenter, yCenter, 0.9f);
     }
 
     // Hàm vẽ hỗ trợ có thêm tham số zoomFactor
