@@ -15,9 +15,9 @@ public enum PlayerCharacter {
             0, 1, 1, 1, 2, 4, 5,
             LoadSave.PLAYER_ORC, 6, 8, 100, 100,
             13, 15, 44, 42),
-    SOLDIER(3, 6, 6, 6, 6, 3, 9,
+    ARCHER(3, 6, 6, 6, 6, 3, 9,
             0, 1, 1, 1, 2, 3, 4,
-            LoadSave.PLAYER_SOLDIER, 5, 9, 96, 96,
+            LoadSave.PLAYER_ARCHER, 5, 9, 96, 96,
             16, 29, 40, 40);
 
 

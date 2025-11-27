@@ -170,7 +170,7 @@ public class Player extends Entity {
 		// --------------------
 
 		// Logic bắn tên (Chỉ chạy khi bấm chuột trái / Tấn công thường)
-		if (playerCharacter == PlayerCharacter.SOLDIER) {
+		if (playerCharacter == PlayerCharacter.ARCHER) {
 			int dir = 1;
 			if (flipW == -1) dir = -1;
 			
@@ -475,6 +475,6 @@ public class Player extends Entity {
         }
     }
     public boolean isSoldier() {
-        return this.playerCharacter == PlayerCharacter.SOLDIER;
+        return this.playerCharacter == PlayerCharacter.ARCHER;
     }
 }
