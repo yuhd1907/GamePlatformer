@@ -20,7 +20,7 @@ public class Arrow extends Projectile {
 
         // --- 2. THIẾT LẬP GIỚI HẠN ---
         this.startX = x; // Lưu vị trí bắt đầu bắn
-        this.range = Game.GAME_WIDTH / 2f; // Tầm bắn bằng 1/3 chiều rộng cửa sổ game
+        this.range = Game.GAME_WIDTH / 2f; 
     }
 
     @Override
