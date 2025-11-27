@@ -22,14 +22,11 @@ public class PlayerSelection extends State implements Statemethods {
 
     private CharacterAnimation[] characterAnimations;
 
-
     public PlayerSelection(Game game) {
         super(game);
-
         loadButtons();
         loadBackground();
         backgroundImgPink = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
-
         loadCharAnimations();
     }
 
@@ -39,7 +36,6 @@ public class PlayerSelection extends State implements Statemethods {
         characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.KNIGHT);
         characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.ORC);
         characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.SOLDIER);
-
     }
 
     private void loadBackground() {
@@ -51,9 +47,7 @@ public class PlayerSelection extends State implements Statemethods {
     }
 
     private void loadButtons() {
-
         playButton = new MenuButton(Game.GAME_WIDTH / 2, (int) (340 * Game.SCALE), 0, Gamestate.PLAYING);
-
     }
 
     @Override
@@ -65,54 +59,58 @@ public class PlayerSelection extends State implements Statemethods {
 
     @Override
     public void draw(Graphics g) {
+        // 1. Vẽ nền
         g.drawImage(backgroundImgPink, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
         g.drawImage(backgroundImg, menuX, menuY, menuWidth, menuHeight, null);
 
         playButton.draw(g);
 
+        // 2. Tính toán vị trí vẽ
+        int yCenter = menuY + menuHeight / 2;
+        int xCenter = menuX + menuWidth / 2;
 
-        //Center
-        drawChar(g, playerIndex, menuX + menuWidth / 2, menuY + menuHeight / 2);
+        // Đẩy 2 nhân vật bên cạnh lùi vào trong 18% để không bị cắt mép bảng
+        int xLeft = menuX + (int)(menuWidth * 0.18); 
+        int xRight = menuX + menuWidth - (int)(menuWidth * 0.18); 
 
-        //Left
-        drawChar(g, playerIndex - 1, menuX, menuY + menuHeight / 2);
+        // 3. VẼ NHÂN VẬT (Logic: Bên cạnh bé - Ở giữa to)
 
-        //Left
-        drawChar(g, playerIndex + 1, menuX + menuWidth, menuY + menuHeight / 2);
+        // --- Vẽ con BÊN TRÁI (Bé: 0.7) ---
+        drawChar(g, playerIndex - 1, xLeft, yCenter, 0.7f);
 
+        // --- Vẽ con BÊN PHẢI (Bé: 0.7) ---
+        drawChar(g, playerIndex + 1, xRight, yCenter, 0.7f);
+
+        // --- Vẽ con Ở GIỮA (To đùng: 1.6 - Vẽ sau cùng để đè lên trên) ---
+        drawChar(g, playerIndex, xCenter, yCenter, 1.6f);
     }
 
-    private void drawChar(Graphics g, int playerIndex, int x, int y) {
+    // Hàm vẽ hỗ trợ có thêm tham số zoomFactor
+    private void drawChar(Graphics g, int playerIndex, int x, int y, float zoomFactor) {
         if (playerIndex < 0)
             playerIndex = characterAnimations.length - 1;
         else if (playerIndex >= characterAnimations.length)
             playerIndex = 0;
-        characterAnimations[playerIndex].draw(g, x, y);
+        
+        // Gọi hàm draw của animation với tham số zoom
+        characterAnimations[playerIndex].draw(g, x, y, zoomFactor);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
         if (isIn(e, playButton))
             playButton.setMousePressed(true);
-
-
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
         if (isIn(e, playButton)) {
             if (playButton.isMousePressed()) {
-
                 game.getPlaying().setPlayerCharacter(characterAnimations[playerIndex].getPc());
                 game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
-
                 playButton.applyGamestate();
             }
-
         }
-
         resetButtons();
     }
 
@@ -123,19 +121,15 @@ public class PlayerSelection extends State implements Statemethods {
     @Override
     public void mouseMoved(MouseEvent e) {
         playButton.setMouseOver(false);
-
-
         if (isIn(e, playButton))
             playButton.setMouseOver(true);
-
-
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT)
             deltaIndex(1);
-        else if(e.getKeyCode() == KeyEvent.VK_RIGHT)
+        else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
             deltaIndex(-1);
     }
 
@@ -147,37 +141,35 @@ public class PlayerSelection extends State implements Statemethods {
             playerIndex = 0;
     }
 
+    @Override
+    public void mouseClicked(MouseEvent e) {}
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
+    public void keyReleased(KeyEvent e) {}
 
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
+    // --- LỚP CON XỬ LÝ ANIMATION ---
     public class CharacterAnimation {
         private final PlayerCharacter pc;
         private int aniTick, aniIndex;
         private final BufferedImage[][] animations;
-        private int scale;
+        private int baseScale; // Kích thước cơ bản
 
         public CharacterAnimation(PlayerCharacter pc) {
             this.pc = pc;
-            this.scale = (int) (Game.SCALE + 6);
+            this.baseScale = (int) (Game.SCALE + 6);
             animations = LoadSave.loadAnimations(pc);
         }
 
-        public void draw(Graphics g, int drawX, int drawY) {
+        // Hàm vẽ được cập nhật để nhận zoomFactor
+        public void draw(Graphics g, int drawX, int drawY, float zoomFactor) {
+            // Tính toán kích thước thực tế sau khi zoom
+            int currentScale = (int) (baseScale * zoomFactor);
+
             g.drawImage(animations[pc.getRowIndex(IDLE)][aniIndex],
-                    drawX - pc.spriteW * scale / 2,
-                    drawY - pc.spriteH * scale / 2,
-                    pc.spriteW * scale,
-                    pc.spriteH * scale,
+                    drawX - pc.spriteW * currentScale / 2,
+                    drawY - pc.spriteH * currentScale / 2,
+                    pc.spriteW * currentScale,
+                    pc.spriteH * currentScale,
                     null);
         }
 
@@ -188,7 +180,6 @@ public class PlayerSelection extends State implements Statemethods {
                 aniIndex++;
                 if (aniIndex >= pc.getSpriteAmount(IDLE)) {
                     aniIndex = 0;
-
                 }
             }
         }
