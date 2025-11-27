@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="7605987a-aa3c-418a-911f-d67cb9b05e78" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gamestates/PlayerSelection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gamestates/PlayerSelection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gamestates/Gamestate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gamestates/Gamestate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gamestates/Menu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gamestates/Menu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inputs/KeyboardInputs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/inputs/KeyboardInputs.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/GameCompletedOverlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/GameCompletedOverlay.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +36,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "chỉnh-sửa",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/84353/OneDrive/Documents/GitHub/GamePlatformer/res",
+    "last_opened_file_path": "C:/Users/84353/OneDrive/Documents/GitHub/GamePlatformer",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
@@ -86,7 +90,8 @@
       <workItem from="1764187111395" duration="423000" />
       <workItem from="1764239763194" duration="613000" />
       <workItem from="1764243564172" duration="164000" />
-      <workItem from="1764245378454" duration="2916000" />
+      <workItem from="1764245378454" duration="2966000" />
+      <workItem from="1764264510228" duration="883000" />
     </task>
     <servers />
   </component>

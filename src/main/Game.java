@@ -15,7 +15,7 @@ public class Game implements Runnable {
 
     private Playing playing;
     private Menu menu;
-    private Credits credits;
+//    private Credits credits;
     private PlayerSelection playerSelection;
     private GameOptions gameOptions;
     private AudioOptions audioOptions;
@@ -46,7 +46,7 @@ public class Game implements Runnable {
         menu = new Menu(this);
         playing = new Playing(this);
         playerSelection = new PlayerSelection(this);
-        credits = new Credits(this);
+//        credits = new Credits(this);
         gameOptions = new GameOptions(this);
     }
 
@@ -61,7 +61,7 @@ public class Game implements Runnable {
             case PLAYER_SELECTION -> playerSelection.update();
             case PLAYING -> playing.update();
             case OPTIONS -> gameOptions.update();
-            case CREDITS -> credits.update();
+//            case CREDITS -> credits.update();
             case QUIT -> System.exit(0);
         }
     }
@@ -73,7 +73,7 @@ public class Game implements Runnable {
             case PLAYER_SELECTION -> playerSelection.draw(g);
             case PLAYING -> playing.draw(g);
             case OPTIONS -> gameOptions.draw(g);
-            case CREDITS -> credits.draw(g);
+//            case CREDITS -> credits.draw(g);
         }
     }
 
@@ -141,9 +141,9 @@ public class Game implements Runnable {
         return playing;
     }
 
-    public Credits getCredits() {
-        return credits;
-    }
+//    public Credits getCredits() {
+//        return credits;
+//    }
 
     public PlayerSelection getPlayerSelection() {
         return playerSelection;

@@ -20,7 +20,7 @@ public class KeyboardInputs implements KeyListener {
         switch (Gamestate.state) {
             case MENU -> gamePanel.getGame().getMenu().keyReleased(e);
             case PLAYING -> gamePanel.getGame().getPlaying().keyReleased(e);
-            case CREDITS -> gamePanel.getGame().getCredits().keyReleased(e);
+//            case CREDITS -> gamePanel.getGame().getCredits().keyReleased(e);
         }
     }
 
