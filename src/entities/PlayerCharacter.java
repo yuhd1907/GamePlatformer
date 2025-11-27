@@ -15,10 +15,10 @@ public enum PlayerCharacter {
             0, 1, 1, 1, 2, 4, 5,
             LoadSave.PLAYER_ORC, 6, 8, 100, 100,
             13, 15, 44, 42),
-    SOLDIER(6, 8, 8, 8, 6, 4, 4,
-            0, 1, 1, 1, 2, 5, 6,
-            LoadSave.PLAYER_SOLDIER, 7, 8, 100, 100,
-            12, 18, 44, 39);
+    SOLDIER(3, 6, 6, 6, 6, 3, 9,
+            0, 1, 1, 1, 2, 3, 4,
+            LoadSave.PLAYER_SOLDIER, 5, 9, 96, 96,
+            16, 29, 40, 40);
 
 
     public int spriteA_IDLE, spriteA_RUNNING, spriteA_JUMP, spriteA_FALLING, spriteA_ATTACK, spriteA_HIT, spriteA_DEAD;

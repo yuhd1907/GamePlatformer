@@ -76,13 +76,13 @@ public class PlayerSelection extends State implements Statemethods {
         // 3. VẼ NHÂN VẬT (Logic: Bên cạnh bé - Ở giữa to)
 
         // --- Vẽ con BÊN TRÁI (Bé: 0.7) ---
-        drawChar(g, playerIndex - 1, xLeft, yCenter, 0.7f);
+        drawChar(g, playerIndex - 1, xLeft, yCenter, 0.5f);
 
         // --- Vẽ con BÊN PHẢI (Bé: 0.7) ---
-        drawChar(g, playerIndex + 1, xRight, yCenter, 0.7f);
+        drawChar(g, playerIndex + 1, xRight, yCenter, 0.5f);
 
         // --- Vẽ con Ở GIỮA (To đùng: 1.6 - Vẽ sau cùng để đè lên trên) ---
-        drawChar(g, playerIndex, xCenter, yCenter, 0.9f);
+        drawChar(g, playerIndex, xCenter, yCenter, 1f);
     }
 
     // Hàm vẽ hỗ trợ có thêm tham số zoomFactor
