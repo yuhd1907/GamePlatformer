@@ -156,30 +156,34 @@ public class Player extends Entity {
 
     // --- HÀM QUAN TRỌNG: CHECK ATTACK ---
     private void checkAttack() {
-        if (attackChecked || aniIndex != 1)
-            return;
-        attackChecked = true;
+		if (attackChecked || aniIndex != 1)
+			return;
+		attackChecked = true;
 
-        if (powerAttackActive)
-            attackChecked = false;
+		// --- SỬA LỖI Ở ĐÂY ---
+		// Nếu đang dùng kỹ năng lướt (Chuột phải), thì thoát hàm ngay.
+		// Không chạy xuống đoạn code tạo mũi tên bên dưới.
+		if (powerAttackActive) {
+			attackChecked = false;
+			return; 
+		}
+		// --------------------
 
-        // LOGIC BẮN TÊN (SOLDIER)
-        if (playerCharacter == PlayerCharacter.SOLDIER) {
-            // Xác định hướng dựa trên flipW
-            int dir = 1;
-            if (flipW == -1) dir = -1;
-            
-            // Thêm mũi tên vào danh sách của Player
-            // Y + 5 * SCALE để khớp với tay súng
-            arrows.add(new Arrow(hitbox.x, hitbox.y + (5 * Game.SCALE), dir));
-        } else {
-            // Các nhân vật khác đánh cận chiến
-            playing.checkEnemyHit(attackBox);
-            playing.checkObjectHit(attackBox);
-        }
-        
-        playing.getGame().getAudioPlayer().playAttackSound();
-    }
+		// Logic bắn tên (Chỉ chạy khi bấm chuột trái / Tấn công thường)
+		if (playerCharacter == PlayerCharacter.SOLDIER) {
+			int dir = 1;
+			if (flipW == -1) dir = -1;
+			
+			// Tạo mũi tên
+			arrows.add(new Arrow(hitbox.x, hitbox.y + (5 * Game.SCALE), dir));
+		} else {
+			// Các nhân vật khác đánh cận chiến
+			playing.checkEnemyHit(attackBox);
+			playing.checkObjectHit(attackBox);
+		}
+		
+		playing.getGame().getAudioPlayer().playAttackSound();
+	}
     
     // --- QUẢN LÝ ARROW ---
     private void updateArrows(int[][] lvlData) {
