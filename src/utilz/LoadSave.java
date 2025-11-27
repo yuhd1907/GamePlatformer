@@ -13,8 +13,8 @@ import javax.imageio.ImageIO;
 
 public class LoadSave {
 
-public static final String PLAYER_KNIGHT = "player_knight.png";
-    public static final String PLAYER_ORC = "player_orc.png";
+    public static final String PLAYER_WOMAN = "player_woman.png";
+    public static final String PLAYER_THOR = "player_thor.png";
     public static final String PLAYER_ARCHER = "player_archer.png";
     public static final String LEVEL_ATLAS = "outside_sprites.png";
     public static final String MENU_BUTTONS = "button_atlas.png";

@@ -7,14 +7,14 @@ import static utilz.Constants.PlayerConstants.*;
 
 public enum PlayerCharacter {
 
-    KNIGHT(7, 8, 2, 3, 6, 4, 12,
+    WOMAN(4, 6, 2, 1, 6, 7, 9,
             0, 1, 2, 3, 4, 5, 6,
-            LoadSave.PLAYER_KNIGHT, 7, 12, 96, 84,
-            18, 27, 39, 30),
-    ORC(6, 8, 8, 8, 6, 4, 4,
-            0, 1, 1, 1, 2, 4, 5,
-            LoadSave.PLAYER_ORC, 6, 8, 100, 100,
-            13, 15, 44, 42),
+            LoadSave.PLAYER_WOMAN, 7, 9, 106, 84,
+            17, 30, 45, 38),
+    THOR(4, 6, 6, 6, 7, 3, 9,
+            0, 1, 1, 1, 2, 3, 4,
+            LoadSave.PLAYER_THOR, 5, 9, 106, 84,
+            18, 30, 42, 29),
     ARCHER(3, 6, 6, 6, 6, 3, 9,
             0, 1, 1, 1, 2, 3, 4,
             LoadSave.PLAYER_ARCHER, 5, 9, 96, 96,
