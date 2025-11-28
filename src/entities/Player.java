@@ -16,8 +16,6 @@ import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
 import utilz.LoadSave;
-
-// Import Arrow từ package objects
 import objects.Arrow; 
 
 public class Player extends Entity {
@@ -30,7 +28,6 @@ public class Player extends Entity {
     private float jumpSpeed = -2.25f * Game.SCALE;
     private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
-    // UI Variables
     private BufferedImage statusBarImg;
     private int statusBarWidth = (int) (192 * Game.SCALE);
     private int statusBarHeight = (int) (58 * Game.SCALE);
@@ -60,8 +57,6 @@ public class Player extends Entity {
     private int powerGrowTick;
 
     private final PlayerCharacter playerCharacter;
-
-    // --- DANH SÁCH MŨI TÊN ---
     private ArrayList<Arrow> arrows = new ArrayList<>();
 
     public Player(PlayerCharacter playerCharacter, Playing playing) {
@@ -75,10 +70,9 @@ public class Player extends Entity {
         animations = LoadSave.loadAnimations(playerCharacter);
         statusBarImg = LoadSave.GetSpriteAtlas(LoadSave.STATUS_BAR);
         
-        // Khởi tạo hitbox và attackbox dựa trên thông số nhân vật (đã có trong Enum PlayerCharacter)
         initHitbox(playerCharacter.hitboxW, playerCharacter.hitboxH);
         
-        // Lấy kích thước AttackBox từ Enum (quan trọng cho THOR, ARCHER...)
+        // Khởi tạo AttackBox
         attackBox = new Rectangle2D.Float(x, y, playerCharacter.attackBoxW, playerCharacter.attackBoxH);
     }
 
@@ -90,7 +84,7 @@ public class Player extends Entity {
     }
 
     private void initAttackBox() {
-        // AttackBox đã được khởi tạo trong Constructor, hàm này có thể để trống hoặc dùng để reset
+        // Để trống
     }
 
     public void update() {
@@ -127,11 +121,16 @@ public class Player extends Entity {
         updateAttackBox();
 
         if (state == HIT) {
-            if (aniIndex <= playerCharacter.getSpriteAmount(state) - 3)
-                pushBack(pushBackDir, lvlData, 1.25f);
-            updatePushBackDrawOffset();
-        } else
-            updatePos();
+			float pushBackSpeed = 1.25f; 
+			if (playerCharacter == PlayerCharacter.WOMAN) {
+				pushBackSpeed = 0.3f; 
+			}
+			if (aniIndex <= playerCharacter.getSpriteAmount(state) - 3)
+				pushBack(pushBackDir, lvlData, pushBackSpeed);
+			
+			updatePushBackDrawOffset();
+		} else
+			updatePos();
 
         if (moving) {
             checkPotionTouched();
@@ -152,43 +151,31 @@ public class Player extends Entity {
 
         updateAnimationTick();
         setAnimation();
-        
-        // Cập nhật mũi tên
         updateArrows(lvlData);
     }
 
-    // --- CHECK ATTACK (LOGIC BẮN CUNG CHO ARCHER) ---
     private void checkAttack() {
-        // 1. Xác định thời điểm gây sát thương (Impact Frame)
-        int attackAnimIndex = 1; // Mặc định cho các con khác (nhanh)
+        int attackAnimIndex = 1; 
 
         if (playerCharacter == PlayerCharacter.THOR) {
-            // Với Thor, búa đập xuống đất thường ở frame thứ 3 hoặc 4
-            // Bạn hãy thử thay số 3 này bằng 2 hoặc 4 nếu thấy chưa khớp animation
-            attackAnimIndex = 4; 
+            attackAnimIndex = 3; // Thor đánh ở frame thứ 4
         }
 
-        // 2. Kiểm tra xem animation đã chạy đến frame gây sát thương chưa
         if (attackChecked || aniIndex != attackAnimIndex)
             return;
             
         attackChecked = true;
 
-        // Nếu đang lướt (Chuột phải) -> Thoát ngay, không bắn tên/đánh
         if (powerAttackActive) {
             attackChecked = false;
             return; 
         }
 
-        // Logic bắn tên: ÁP DỤNG CHO ARCHER
         if (playerCharacter == PlayerCharacter.ARCHER) {
             int dir = 1;
             if (flipW == -1) dir = -1;
-            
-            // Tạo mũi tên
             arrows.add(new Arrow(hitbox.x, hitbox.y + (5 * Game.SCALE), dir));
         } else {
-            // Các nhân vật khác (THOR, WOMAN...) đánh cận chiến
             playing.checkEnemyHit(attackBox);
             playing.checkObjectHit(attackBox);
         }
@@ -196,7 +183,6 @@ public class Player extends Entity {
         playing.getGame().getAudioPlayer().playAttackSound();
     }
     
-    // --- QUẢN LÝ ARROW ---
     private void updateArrows(int[][] lvlData) {
         for (Arrow a : arrows) {
             if (a.isActive()) {
@@ -216,7 +202,6 @@ public class Player extends Entity {
     public ArrayList<Arrow> getArrows() {
         return arrows;
     }
-    // ---------------------
 
     private void checkInsideWater() {
         if (IsEntityInWater(hitbox, playing.getLevelManager().getCurrentLevel().getLevelData()))
@@ -231,12 +216,14 @@ public class Player extends Entity {
         playing.checkPotionTouched(hitbox);
     }
 
-    // Cập nhật vị trí AttackBox (Dành cho Thor và các char cận chiến)
     private void updateAttackBox() {
+        // Fix điểm mù: Lùi AttackBox vào trong người một chút (Overlap)
+        int overlap = (int) (Game.SCALE * 5); 
+
         if (right || (powerAttackActive && flipW == 1)) {
-            attackBox.x = hitbox.x + hitbox.width + (int) (Game.SCALE * 10);
+            attackBox.x = hitbox.x + hitbox.width - overlap;
         } else if (left || (powerAttackActive && flipW == -1)) {
-            attackBox.x = hitbox.x - hitbox.width - (int) (Game.SCALE * 10) - attackBox.width;
+            attackBox.x = hitbox.x - attackBox.width + overlap;
         }
         
         attackBox.y = hitbox.y + (Game.SCALE * 10);
@@ -259,12 +246,10 @@ public class Player extends Entity {
         g.drawImage(animations[playerCharacter.getRowIndex(state)][aniIndex], (int) (hitbox.x - playerCharacter.xDrawOffset) - lvlOffset + flipX, (int) (hitbox.y - playerCharacter.yDrawOffset + (int) (pushDrawOffset)), width * flipW, height, null);
         drawHitbox(g, lvlOffset);
         
-        // Vẽ mũi tên
+        // Vẽ AttackBox (Uncomment để debug nếu cần)
+        // drawAttackBox(g, lvlOffset);
+        
         drawArrows(g, lvlOffset);
-        
-        // Vẽ AttackBox (Bật lên nếu cần debug)
-        // drawAttackBox(g, lvlOffset); 
-        
         drawUI(g);
     }
 
@@ -279,16 +264,13 @@ public class Player extends Entity {
     private void updateAnimationTick() {
         aniTick++;
         
-        // --- CHỈNH TỐC ĐỘ RIÊNG CHO THOR ---
-        // Mặc định ANI_SPEED có thể là 25 (chậm).
-        // Nếu là THOR và đang ATTACK, ta giảm speed xuống còn 15 (càng nhỏ càng nhanh)
         int speed = ANI_SPEED;
+        // Tăng tốc độ đánh cho Thor (số càng nhỏ càng nhanh)
         if (playerCharacter == PlayerCharacter.THOR && state == ATTACK) {
-            speed = 15; // Tăng tốc độ đánh (số càng nhỏ càng nhanh)
+            speed = 15; 
         }
-        // ------------------------------------
 
-        if (aniTick >= speed) { // Thay ANI_SPEED bằng biến speed vừa tạo
+        if (aniTick >= speed) { 
             aniTick = 0;
             aniIndex++;
             if (aniIndex >= playerCharacter.getSpriteAmount(state)) {
@@ -401,28 +383,18 @@ public class Player extends Entity {
         }
     }
 
+    // --- HÀM GIẢM SÁT THƯƠNG CHO WOMAN ---
     public void changeHealth(int value) {
-		// value < 0 nghĩa là đang bị trừ máu (nhận sát thương)
-		if (value < 0) {
-			
-			// --- LOGIC MỚI: NỘI TẠI GIẢM SÁT THƯƠNG CHO WOMAN ---
-			if (playerCharacter == PlayerCharacter.WOMAN) {
-				// Chia đôi sát thương
-				// Ví dụ: Quái đánh -20 => Chỉ còn -10
-				// Ví dụ: Pháo bắn -25 => Chỉ còn -12
-				value = value / 2; 
-			}
-			// ----------------------------------------------------
-
-			if (state == HIT)
-				return;
-			else
-				newState(HIT);
-		}
-
-		currentHealth += value;
-		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
-	}
+        if (value < 0) {
+            if (playerCharacter == PlayerCharacter.WOMAN) {
+                value = value / 2; // Giảm 50% sát thương
+            }
+            if (state == HIT) return;
+            else newState(HIT);
+        }
+        currentHealth += value;
+        currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
+    }
 
     public void changeHealth(int value, Enemy e) {
         if (state == HIT) return;
@@ -483,7 +455,6 @@ public class Player extends Entity {
         }
     }
     
-    // Đổi tên hàm thành isArcher cho đúng nghĩa
     public boolean isArcher() {
         return this.playerCharacter == PlayerCharacter.ARCHER;
     }
