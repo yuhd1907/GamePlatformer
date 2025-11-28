@@ -115,8 +115,6 @@ public class ObjectManager {
         for (int i = 0; i < cannonImgs.length; i++)
             cannonImgs[i] = temp.getSubimage(i * 40, 0, 40, 26);
 
-        // cannonBallImg = LoadSave.GetSpriteAtlas(LoadSave.CANNON_BALL); // Không cần nữa
-
         treeImgs = new BufferedImage[2][4];
         BufferedImage treeOneImg = LoadSave.GetSpriteAtlas(LoadSave.TREE_ONE_ATLAS);
         for (int i = 0; i < 4; i++)
@@ -178,7 +176,6 @@ public class ObjectManager {
     private void updateProjectiles(int[][] lvlData, Player player) {
         for (CannonBall p : projectiles)
             if (p.isActive()) {
-                // Dùng hàm update(lvlData) thay vì updatePos()
                 p.update(lvlData); 
                 
                 if (p.getHitbox().intersects(player.getHitbox())) {

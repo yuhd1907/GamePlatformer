@@ -246,7 +246,7 @@ public class Player extends Entity {
 
     public void render(Graphics g, int lvlOffset) {
         g.drawImage(animations[playerCharacter.getRowIndex(state)][aniIndex], (int) (hitbox.x - playerCharacter.xDrawOffset) - lvlOffset + flipX, (int) (hitbox.y - playerCharacter.yDrawOffset + (int) (pushDrawOffset)), width * flipW, height, null);
-        drawHitbox(g, lvlOffset);
+        // drawHitbox(g, lvlOffset);
         
         // Bật dòng này lên nếu bạn muốn nhìn thấy vùng đánh màu đỏ để kiểm tra
         // drawAttackBox(g, lvlOffset);
