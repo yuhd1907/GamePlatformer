@@ -182,7 +182,7 @@ public class ObjectManager {
                 p.update(lvlData); 
                 
                 if (p.getHitbox().intersects(player.getHitbox())) {
-                    player.changeHealth(-25);
+                    player.changeHealth(-15);
                     p.setActive(false);
                 } else if (IsProjectileHittingLevel(p, lvlData)) {
                     p.setActive(false);

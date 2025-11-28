@@ -336,23 +336,26 @@ public void update() {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        if (!gameOver && !gameCompleted && !lvlCompleted)
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_A:
-                    player.setLeft(true);
-                    break;
-                case KeyEvent.VK_D:
-                    player.setRight(true);
-                    break;
-                case KeyEvent.VK_W:
-                    player.setJump(true);
-                    break;
-                case KeyEvent.VK_ESCAPE:
-                    paused = !paused;
-                    break;
-            }
-    }
+	public void keyPressed(KeyEvent e) {
+		if (!gameOver && !gameCompleted && !lvlCompleted)
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_A:
+				player.setLeft(true);
+				break;
+			case KeyEvent.VK_D:
+				player.setRight(true);
+				break;
+			case KeyEvent.VK_W:
+				player.setJump(true);
+				break;
+			case KeyEvent.VK_ESCAPE:
+				paused = !paused;
+				break;
+			case KeyEvent.VK_L:
+				loadNextLevel();
+				break;
+			}
+	}
 
     @Override
     public void keyReleased(KeyEvent e) {
