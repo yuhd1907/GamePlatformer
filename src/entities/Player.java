@@ -274,7 +274,7 @@ public class Player extends Entity {
             } else if (playerCharacter == PlayerCharacter.WOMAN) {
                 speed = 20; 
             } else if (playerCharacter == PlayerCharacter.ARCHER) {
-                speed = 25; 
+                speed = 20; 
             }
         }
 
