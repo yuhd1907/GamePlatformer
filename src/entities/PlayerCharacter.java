@@ -10,15 +10,20 @@ public enum PlayerCharacter {
     WOMAN(4, 6, 2, 1, 6, 7, 9,
             0, 1, 2, 3, 4, 5, 6,
             LoadSave.PLAYER_WOMAN, 7, 9, 106, 84,
-            17, 30, 45, 38),
+            17, 30, 45, 38, 
+            30, 40), // Tầm đánh thường
+
     THOR(4, 6, 6, 6, 7, 3, 9,
             0, 1, 1, 1, 2, 3, 4,
             LoadSave.PLAYER_THOR, 5, 9, 106, 84,
-            18, 30, 42, 29),
+            18, 30, 42, 29, 
+            50, 50), 
+
     ARCHER(3, 6, 6, 6, 6, 3, 9,
             0, 1, 1, 1, 2, 3, 4,
             LoadSave.PLAYER_ARCHER, 5, 9, 96, 96,
-            16, 29, 40, 40);
+            16, 29, 40, 40, 
+            30, 30); // Tầm đánh thường
 
 
     public int spriteA_IDLE, spriteA_RUNNING, spriteA_JUMP, spriteA_FALLING, spriteA_ATTACK, spriteA_HIT, spriteA_DEAD;
@@ -28,18 +33,16 @@ public enum PlayerCharacter {
     public int spriteW, spriteH;
     public int hitboxW, hitboxH;
     public int xDrawOffset, yDrawOffset;
-
-
-    /*
-     private float xDrawOffset = 21 * Game.SCALE;
-    private float yDrawOffset = 4 * Game.SCALE;
-     */
+    
+    // --- THÊM BIẾN MỚI ---
+    public int attackBoxW, attackBoxH;
 
     PlayerCharacter(int spriteA_IDLE, int spriteA_RUNNING, int spriteA_JUMP, int spriteA_FALLING, int spriteA_ATTACK, int spriteA_HIT, int spriteA_DEAD,
                     int rowIDLE, int rowRUNNING, int rowJUMP, int rowFALLING, int rowATTACK, int rowHIT, int rowDEAD,
                     String playerAtlas, int rowA, int colA, int spriteW, int spriteH,
                     int hitboxW, int hitboxH,
-                    int xDrawOffset, int yDrawOffset) {
+                    int xDrawOffset, int yDrawOffset,
+                    int attackBoxW, int attackBoxH) { // <--- Cập nhật Constructor nhận thêm 2 tham số
 
         this.spriteA_IDLE = spriteA_IDLE;
         this.spriteA_RUNNING = spriteA_RUNNING;
@@ -68,6 +71,10 @@ public enum PlayerCharacter {
 
         this.xDrawOffset = (int) (xDrawOffset * Game.SCALE);
         this.yDrawOffset = (int) (yDrawOffset * Game.SCALE);
+        
+        // --- GÁN GIÁ TRỊ MỚI ---
+        this.attackBoxW = (int) (attackBoxW * Game.SCALE);
+        this.attackBoxH = (int) (attackBoxH * Game.SCALE);
     }
 
     public int getSpriteAmount(int player_action) {

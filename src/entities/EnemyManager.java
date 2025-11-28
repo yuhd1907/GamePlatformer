@@ -10,9 +10,9 @@ import levels.Level;
 import utilz.LoadSave;
 import static utilz.Constants.EnemyConstants.*;
 
-// --- QUAN TRỌNG: PHẢI CÓ DÒNG NÀY VÌ ARROW Ở FOLDER OBJECTS ---
+// --- Import Arrow từ package objects ---
 import objects.Arrow; 
-// -------------------------------------------------------------
+// ---------------------------------------
 
 public class EnemyManager {
 
@@ -89,43 +89,48 @@ public class EnemyManager {
             }
     }
 
-    // Kiểm tra va chạm khi người chơi chém (cận chiến)
+    // --- HÀM 1: ĐÁNH CẬN CHIẾN (THOR / WOMAN) ---
+    // Logic: KHÔNG CÓ RETURN để đánh lan (AoE) trúng nhiều con cùng lúc
     public void checkEnemyHit(Rectangle2D.Float attackBox) {
+        // 1. Cua
         for (Crabby c : currentLevel.getCrabs())
             if (c.isActive())
                 if (c.getState() != DEAD && c.getState() != HIT)
                     if (attackBox.intersects(c.getHitbox())) {
                         c.hurt(20);
-                        return;
+                        // Đã xóa return -> Đánh tiếp con khác
                     }
 
+        // 2. Sao biển
         for (Pinkstar p : currentLevel.getPinkstars())
             if (p.isActive()) {
                 if (p.getState() == ATTACK && p.getAniIndex() >= 3)
-                    return;
+                    continue; 
                 else {
                     if (p.getState() != DEAD && p.getState() != HIT)
                         if (attackBox.intersects(p.getHitbox())) {
                             p.hurt(20);
-                            return;
+                            // Đã xóa return
                         }
                 }
             }
 
+        // 3. Cá mập
         for (Shark s : currentLevel.getSharks())
             if (s.isActive()) {
                 if (s.getState() != DEAD && s.getState() != HIT)
                     if (attackBox.intersects(s.getHitbox())) {
                         s.hurt(20);
-                        return;
+                        // Đã xóa return
                     }
             }
     }
 
-    // --- HÀM KIỂM TRA MŨI TÊN (ĐÃ SỬA ĐỂ NHẬN LIST ARROW) ---
+    // --- HÀM 2: BẮN CUNG (ARCHER) ---
+    // Logic: CÓ BREAK/CONTINUE để 1 mũi tên chỉ trúng 1 con rồi biến mất
     public void checkEnemyHit(ArrayList<Arrow> arrows) {
         for (Arrow a : arrows) {
-            // Nếu mũi tên này đã trúng cái gì đó hoặc không hoạt động thì bỏ qua
+            // Nếu mũi tên đã trúng/hỏng thì bỏ qua
             if (!a.isActive()) continue;
 
             // 1. Check Cua
@@ -133,20 +138,22 @@ public class EnemyManager {
                 if (c.isActive() && c.getState() != DEAD && c.getState() != HIT)
                     if (a.getHitbox().intersects(c.getHitbox())) {
                         c.hurt(a.getDamage());
-                        a.setActive(false); // Mũi tên biến mất
+                        a.setActive(false); // Hủy mũi tên
+                        break; // Thoát vòng lặp quái (1 tên 1 quái)
                     }
 
-            if (!a.isActive()) continue; // Nếu trúng Cua rồi thì không check con khác nữa
+            if (!a.isActive()) continue; // Check tiếp nếu tên chưa trúng
 
             // 2. Check Sao biển
             for (Pinkstar p : currentLevel.getPinkstars())
                 if (p.isActive()) {
                     if (p.getState() == ATTACK && p.getAniIndex() >= 3)
-                        continue; // Đang lăn thì né được
+                        continue;
                     if (p.getState() != DEAD && p.getState() != HIT)
                         if (a.getHitbox().intersects(p.getHitbox())) {
                             p.hurt(a.getDamage());
                             a.setActive(false);
+                            break;
                         }
                 }
 
@@ -159,6 +166,7 @@ public class EnemyManager {
                         if (a.getHitbox().intersects(s.getHitbox())) {
                             s.hurt(a.getDamage());
                             a.setActive(false);
+                            break;
                         }
         }
     }
