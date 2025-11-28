@@ -72,6 +72,7 @@ public class Player extends Entity {
         
         initHitbox(playerCharacter.hitboxW, playerCharacter.hitboxH);
         
+        // Khởi tạo AttackBox
         attackBox = new Rectangle2D.Float(x, y, playerCharacter.attackBoxW, playerCharacter.attackBoxH);
     }
 
@@ -119,7 +120,6 @@ public class Player extends Entity {
         updateAttackBox();
 
         if (state == HIT) {
-            // Woman bị đẩy lùi nhẹ hơn (hoặc đứng im) khi trúng đòn
             float pushBackSpeed = 1.25f;
             if (playerCharacter == PlayerCharacter.WOMAN) {
                 pushBackSpeed = 0.3f;
@@ -155,8 +155,10 @@ public class Player extends Entity {
     }
 
     private void checkAttack() {
+        // Mặc định đánh nhanh (frame 1) cho Woman, Orc...
         int attackAnimIndex = 1; 
 
+        // Thor đánh chậm hơn (frame 4 -> index 3)
         if (playerCharacter == PlayerCharacter.THOR) {
             attackAnimIndex = 3; 
         }
@@ -216,19 +218,16 @@ public class Player extends Entity {
         playing.checkPotionTouched(hitbox);
     }
 
+    // --- ĐÃ SỬA LẠI VỊ TRÍ ATTACKBOX CHO CHUẨN ---
     private void updateAttackBox() {
-        // Fix điểm mù cho Woman (lùi sâu hơn vì kiếm ngắn)
-        int overlap = (int) (Game.SCALE * 5); 
-        if (playerCharacter == PlayerCharacter.WOMAN) {
-            overlap = (int) (Game.SCALE * 15);
-        }
-
+        // Quay về vị trí cơ bản, không lùi sâu quá gây lỗi
         if (right || (powerAttackActive && flipW == 1)) {
-            attackBox.x = hitbox.x + hitbox.width - overlap;
+            attackBox.x = hitbox.x + hitbox.width + (int) (Game.SCALE * 2); // Cách ra 1 xíu
         } else if (left || (powerAttackActive && flipW == -1)) {
-            attackBox.x = hitbox.x - attackBox.width + overlap;
+            attackBox.x = hitbox.x - hitbox.width - (int) (Game.SCALE * 2) - attackBox.width;
         }
         
+        // QUAN TRỌNG: Đặt AttackBox xuống thấp lại để đánh trúng mấy con quái lùn (Cua)
         attackBox.y = hitbox.y + (Game.SCALE * 10);
     }
 
@@ -248,6 +247,10 @@ public class Player extends Entity {
     public void render(Graphics g, int lvlOffset) {
         g.drawImage(animations[playerCharacter.getRowIndex(state)][aniIndex], (int) (hitbox.x - playerCharacter.xDrawOffset) - lvlOffset + flipX, (int) (hitbox.y - playerCharacter.yDrawOffset + (int) (pushDrawOffset)), width * flipW, height, null);
         drawHitbox(g, lvlOffset);
+        
+        // Bật dòng này lên nếu bạn muốn nhìn thấy vùng đánh màu đỏ để kiểm tra
+        // drawAttackBox(g, lvlOffset);
+        
         drawArrows(g, lvlOffset);
         drawUI(g);
     }
@@ -264,8 +267,15 @@ public class Player extends Entity {
         aniTick++;
         
         int speed = ANI_SPEED;
-        if (playerCharacter == PlayerCharacter.THOR && state == ATTACK) {
-            speed = 15; 
+        
+        if (state == ATTACK) {
+            if (playerCharacter == PlayerCharacter.THOR) {
+                speed = 15; 
+            } else if (playerCharacter == PlayerCharacter.WOMAN) {
+                speed = 20; 
+            } else if (playerCharacter == PlayerCharacter.ARCHER) {
+                speed = 25; 
+            }
         }
 
         if (aniTick >= speed) { 
@@ -381,7 +391,6 @@ public class Player extends Entity {
         }
     }
 
-    // --- ĐÃ SỬA: WOMAN NHẬN 50% SÁT THƯƠNG ---
     public void changeHealth(int value) {
         if (value < 0) {
             if (playerCharacter == PlayerCharacter.WOMAN) {
