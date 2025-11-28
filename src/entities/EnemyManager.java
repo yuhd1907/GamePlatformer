@@ -10,14 +10,14 @@ import levels.Level;
 import utilz.LoadSave;
 import static utilz.Constants.EnemyConstants.*;
 
-// --- Import Arrow từ package objects ---
-import objects.Arrow; 
-// ---------------------------------------
+// --- QUAN TRỌNG: PHẢI CÓ DÒNG NÀY VÌ ARROW Ở FOLDER OBJECTS ---
+import objects.Arrow;
+// -------------------------------------------------------------
 
 public class EnemyManager {
 
     private Playing playing;
-    private BufferedImage[][] crabbyArr, pinkstarArr, sharkArr;
+    private BufferedImage[][] goblinArr, pinkstarArr, mushroomArr;
     private Level currentLevel;
 
     public EnemyManager(Playing playing) {
@@ -31,19 +31,19 @@ public class EnemyManager {
 
     public void update(int[][] lvlData) {
         boolean isAnyActive = false;
-        for (Crabby c : currentLevel.getCrabs())
+        for (Goblin c : currentLevel.getGobs())
             if (c.isActive()) {
                 c.update(lvlData, playing);
                 isAnyActive = true;
             }
 
-        for (Pinkstar p : currentLevel.getPinkstars())
+        for (Bird p : currentLevel.getBirds())
             if (p.isActive()) {
                 p.update(lvlData, playing);
                 isAnyActive = true;
             }
 
-        for (Shark s : currentLevel.getSharks())
+        for (Mushroom s : currentLevel.getMushs())
             if (s.isActive()) {
                 s.update(lvlData, playing);
                 isAnyActive = true;
@@ -54,127 +54,119 @@ public class EnemyManager {
     }
 
     public void draw(Graphics g, int xLvlOffset) {
-        drawCrabs(g, xLvlOffset);
-        drawPinkstars(g, xLvlOffset);
-        drawSharks(g, xLvlOffset);
+        drawGobs(g, xLvlOffset);
+        drawBirds(g, xLvlOffset);
+        drawMushs(g, xLvlOffset);
     }
 
-    private void drawSharks(Graphics g, int xLvlOffset) {
-        for (Shark s : currentLevel.getSharks())
+    private void drawMushs(Graphics g, int xLvlOffset) {
+        for (Mushroom s : currentLevel.getMushs())
             if (s.isActive()) {
-                g.drawImage(sharkArr[s.getState()][s.getAniIndex()], 
-                    (int) s.getHitbox().x - xLvlOffset - SHARK_DRAWOFFSET_X + s.flipX(),
-                    (int) s.getHitbox().y - SHARK_DRAWOFFSET_Y + (int) s.getPushDrawOffset(), 
-                    SHARK_WIDTH * s.flipW(), SHARK_HEIGHT, null);
+                g.drawImage(mushroomArr[s.getState()][s.getAniIndex()],
+                        (int) s.getHitbox().x - xLvlOffset - MUSHROOM_DRAWOFFSET_X + s.flipX(),
+                        (int) s.getHitbox().y - MUSHROOM_DRAWOFFSET_Y + (int) s.getPushDrawOffset(),
+                        MUSHROOM_WIDTH * s.flipW(), MUSHROOM_HEIGHT, null);
             }
     }
 
-    private void drawPinkstars(Graphics g, int xLvlOffset) {
-        for (Pinkstar p : currentLevel.getPinkstars())
+    private void drawBirds(Graphics g, int xLvlOffset) {
+        for (Bird p : currentLevel.getBirds())
             if (p.isActive()) {
-                g.drawImage(pinkstarArr[p.getState()][p.getAniIndex()], 
-                    (int) p.getHitbox().x - xLvlOffset - PINKSTAR_DRAWOFFSET_X + p.flipX(),
-                    (int) p.getHitbox().y - PINKSTAR_DRAWOFFSET_Y + (int) p.getPushDrawOffset(), 
-                    PINKSTAR_WIDTH * p.flipW(), PINKSTAR_HEIGHT, null);
+                g.drawImage(pinkstarArr[p.getState()][p.getAniIndex()],
+                        (int) p.getHitbox().x - xLvlOffset - BIRD_DRAWOFFSET_X + p.flipX(),
+                        (int) p.getHitbox().y - BIRD_DRAWOFFSET_Y + (int) p.getPushDrawOffset(),
+                        BIRD_WIDTH * p.flipW(), BIRD_HEIGHT, null);
             }
     }
 
-    private void drawCrabs(Graphics g, int xLvlOffset) {
-        for (Crabby c : currentLevel.getCrabs())
+    private void drawGobs(Graphics g, int xLvlOffset) {
+        for (Goblin c : currentLevel.getGobs())
             if (c.isActive()) {
-                g.drawImage(crabbyArr[c.getState()][c.getAniIndex()], 
-                    (int) c.getHitbox().x - xLvlOffset - CRABBY_DRAWOFFSET_X + c.flipX(),
-                    (int) c.getHitbox().y - CRABBY_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), 
-                    CRABBY_WIDTH * c.flipW(), CRABBY_HEIGHT, null);
+                g.drawImage(goblinArr[c.getState()][c.getAniIndex()],
+                        (int) c.getHitbox().x - xLvlOffset - GOBLIN_DRAWOFFSET_X + c.flipX(),
+                        (int) c.getHitbox().y - GOBLIN_DRAWOFFSET_Y + (int) c.getPushDrawOffset(),
+                        GOBLIN_WIDTH * c.flipW(), GOBLIN_HEIGHT, null);
             }
     }
 
-    // --- HÀM 1: ĐÁNH CẬN CHIẾN (THOR / WOMAN) ---
-    // Logic: KHÔNG CÓ RETURN để đánh lan (AoE) trúng nhiều con cùng lúc
+    // Kiểm tra va chạm khi người chơi chém (cận chiến)
     public void checkEnemyHit(Rectangle2D.Float attackBox) {
-        // 1. Cua
-        for (Crabby c : currentLevel.getCrabs())
+        for (Goblin c : currentLevel.getGobs())
             if (c.isActive())
                 if (c.getState() != DEAD && c.getState() != HIT)
                     if (attackBox.intersects(c.getHitbox())) {
                         c.hurt(20);
-                        // Đã xóa return -> Đánh tiếp con khác
+                        return;
                     }
 
-        // 2. Sao biển
-        for (Pinkstar p : currentLevel.getPinkstars())
+        for (Bird p : currentLevel.getBirds())
             if (p.isActive()) {
                 if (p.getState() == ATTACK && p.getAniIndex() >= 3)
-                    continue; 
+                    return;
                 else {
                     if (p.getState() != DEAD && p.getState() != HIT)
                         if (attackBox.intersects(p.getHitbox())) {
                             p.hurt(20);
-                            // Đã xóa return
+                            return;
                         }
                 }
             }
 
-        // 3. Cá mập
-        for (Shark s : currentLevel.getSharks())
+        for (Mushroom s : currentLevel.getMushs())
             if (s.isActive()) {
                 if (s.getState() != DEAD && s.getState() != HIT)
                     if (attackBox.intersects(s.getHitbox())) {
                         s.hurt(20);
-                        // Đã xóa return
+                        return;
                     }
             }
     }
 
-    // --- HÀM 2: BẮN CUNG (ARCHER) ---
-    // Logic: CÓ BREAK/CONTINUE để 1 mũi tên chỉ trúng 1 con rồi biến mất
+    // --- HÀM KIỂM TRA MŨI TÊN (ĐÃ SỬA ĐỂ NHẬN LIST ARROW) ---
     public void checkEnemyHit(ArrayList<Arrow> arrows) {
         for (Arrow a : arrows) {
-            // Nếu mũi tên đã trúng/hỏng thì bỏ qua
+            // Nếu mũi tên này đã trúng cái gì đó hoặc không hoạt động thì bỏ qua
             if (!a.isActive()) continue;
 
             // 1. Check Cua
-            for (Crabby c : currentLevel.getCrabs())
+            for (Goblin c : currentLevel.getGobs())
                 if (c.isActive() && c.getState() != DEAD && c.getState() != HIT)
                     if (a.getHitbox().intersects(c.getHitbox())) {
                         c.hurt(a.getDamage());
-                        a.setActive(false); // Hủy mũi tên
-                        break; // Thoát vòng lặp quái (1 tên 1 quái)
+                        a.setActive(false); // Mũi tên biến mất
                     }
 
-            if (!a.isActive()) continue; // Check tiếp nếu tên chưa trúng
+            if (!a.isActive()) continue; // Nếu trúng Cua rồi thì không check con khác nữa
 
             // 2. Check Sao biển
-            for (Pinkstar p : currentLevel.getPinkstars())
+            for (Bird p : currentLevel.getBirds())
                 if (p.isActive()) {
                     if (p.getState() == ATTACK && p.getAniIndex() >= 3)
-                        continue;
+                        continue; // Đang lăn thì né được
                     if (p.getState() != DEAD && p.getState() != HIT)
                         if (a.getHitbox().intersects(p.getHitbox())) {
                             p.hurt(a.getDamage());
                             a.setActive(false);
-                            break;
                         }
                 }
 
             if (!a.isActive()) continue;
 
             // 3. Check Cá mập
-            for (Shark s : currentLevel.getSharks())
+            for (Mushroom s : currentLevel.getMushs())
                 if (s.isActive())
                     if (s.getState() != DEAD && s.getState() != HIT)
                         if (a.getHitbox().intersects(s.getHitbox())) {
                             s.hurt(a.getDamage());
                             a.setActive(false);
-                            break;
                         }
         }
     }
 
     private void loadEnemyImgs() {
-        crabbyArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.CRABBY_SPRITE), 9, 5, CRABBY_WIDTH_DEFAULT, CRABBY_HEIGHT_DEFAULT);
-        pinkstarArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.PINKSTAR_ATLAS), 8, 5, PINKSTAR_WIDTH_DEFAULT, PINKSTAR_HEIGHT_DEFAULT);
-        sharkArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.SHARK_ATLAS), 8, 5, SHARK_WIDTH_DEFAULT, SHARK_HEIGHT_DEFAULT);
+        goblinArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.GOBLIN_SPRITE), 8, 5, GOBLIN_WIDTH_DEFAULT, GOBLIN_HEIGHT_DEFAULT);
+        pinkstarArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.BIRD_SPRITE), 8, 5, BIRD_WIDTH_DEFAULT, BIRD_HEIGHT_DEFAULT);
+        mushroomArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.MUSHROOM_SPRITE), 8, 5, MUSHROOM_WIDTH_DEFAULT, MUSHROOM_HEIGHT_DEFAULT);
     }
 
     private BufferedImage[][] getImgArr(BufferedImage atlas, int xSize, int ySize, int spriteW, int spriteH) {
@@ -186,11 +178,11 @@ public class EnemyManager {
     }
 
     public void resetAllEnemies() {
-        for (Crabby c : currentLevel.getCrabs())
+        for (Goblin c : currentLevel.getGobs())
             c.resetEnemy();
-        for (Pinkstar p : currentLevel.getPinkstars())
+        for (Bird p : currentLevel.getBirds())
             p.resetEnemy();
-        for (Shark s : currentLevel.getSharks())
+        for (Mushroom s : currentLevel.getMushs())
             s.resetEnemy();
     }
 }
