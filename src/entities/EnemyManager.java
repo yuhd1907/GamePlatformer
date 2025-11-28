@@ -37,7 +37,7 @@ public class EnemyManager {
                 isAnyActive = true;
             }
 
-        for (Bird p : currentLevel.getBirds())
+        for (Pinkstar p : currentLevel.getPinkstar())
             if (p.isActive()) {
                 p.update(lvlData, playing);
                 isAnyActive = true;
@@ -55,7 +55,7 @@ public class EnemyManager {
 
     public void draw(Graphics g, int xLvlOffset) {
         drawGobs(g, xLvlOffset);
-        drawBirds(g, xLvlOffset);
+        drawPinkstar(g, xLvlOffset);
         drawMushs(g, xLvlOffset);
     }
 
@@ -69,13 +69,13 @@ public class EnemyManager {
             }
     }
 
-    private void drawBirds(Graphics g, int xLvlOffset) {
-        for (Bird p : currentLevel.getBirds())
+    private void drawPinkstar(Graphics g, int xLvlOffset) {
+        for (Pinkstar p : currentLevel.getPinkstar())
             if (p.isActive()) {
                 g.drawImage(pinkstarArr[p.getState()][p.getAniIndex()],
-                        (int) p.getHitbox().x - xLvlOffset - BIRD_DRAWOFFSET_X + p.flipX(),
-                        (int) p.getHitbox().y - BIRD_DRAWOFFSET_Y + (int) p.getPushDrawOffset(),
-                        BIRD_WIDTH * p.flipW(), BIRD_HEIGHT, null);
+                        (int) p.getHitbox().x - xLvlOffset - PINKSTAR_DRAWOFFSET_X + p.flipX(),
+                        (int) p.getHitbox().y - PINKSTAR_DRAWOFFSET_Y + (int) p.getPushDrawOffset(),
+                        PINKSTAR_WIDTH * p.flipW(), PINKSTAR_HEIGHT, null);
             }
     }
 
@@ -99,7 +99,7 @@ public class EnemyManager {
                         return;
                     }
 
-        for (Bird p : currentLevel.getBirds())
+        for (Pinkstar p : currentLevel.getPinkstar())
             if (p.isActive()) {
                 if (p.getState() == ATTACK && p.getAniIndex() >= 3)
                     return;
@@ -139,7 +139,7 @@ public class EnemyManager {
             if (!a.isActive()) continue; // Nếu trúng Cua rồi thì không check con khác nữa
 
             // 2. Check Sao biển
-            for (Bird p : currentLevel.getBirds())
+            for (Pinkstar p : currentLevel.getPinkstar())
                 if (p.isActive()) {
                     if (p.getState() == ATTACK && p.getAniIndex() >= 3)
                         continue; // Đang lăn thì né được
@@ -165,7 +165,7 @@ public class EnemyManager {
 
     private void loadEnemyImgs() {
         goblinArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.GOBLIN_SPRITE), 8, 5, GOBLIN_WIDTH_DEFAULT, GOBLIN_HEIGHT_DEFAULT);
-        pinkstarArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.BIRD_SPRITE), 8, 5, BIRD_WIDTH_DEFAULT, BIRD_HEIGHT_DEFAULT);
+        pinkstarArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.PINKSTAR_ATLAS), 8, 5, PINKSTAR_WIDTH_DEFAULT, PINKSTAR_HEIGHT_DEFAULT);
         mushroomArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.MUSHROOM_SPRITE), 8, 5, MUSHROOM_WIDTH_DEFAULT, MUSHROOM_HEIGHT_DEFAULT);
     }
 
@@ -180,7 +180,7 @@ public class EnemyManager {
     public void resetAllEnemies() {
         for (Goblin c : currentLevel.getGobs())
             c.resetEnemy();
-        for (Bird p : currentLevel.getBirds())
+        for (Pinkstar p : currentLevel.getPinkstar())
             p.resetEnemy();
         for (Mushroom s : currentLevel.getMushs())
             s.resetEnemy();

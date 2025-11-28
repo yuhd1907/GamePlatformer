@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import entities.Goblin;
-import entities.Bird;
+import entities.Pinkstar;
 import entities.Mushroom;
 import main.Game;
 import objects.BackgroundTree;
@@ -25,7 +25,7 @@ public class Level {
     private int[][] lvlData;
 
     private ArrayList<Goblin> gobs = new ArrayList<>();
-    private ArrayList<Bird> birds = new ArrayList<>();
+    private ArrayList<Pinkstar> birds = new ArrayList<>();
     private ArrayList<Mushroom> mushs = new ArrayList<>();
     private ArrayList<Potion> potions = new ArrayList<>();
     private ArrayList<Spike> spikes = new ArrayList<>();
@@ -83,7 +83,7 @@ public class Level {
     private void loadEntities(int greenValue, int x, int y) {
         switch (greenValue) {
             case GOBLIN -> gobs.add(new Goblin(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
-            case BIRD -> birds.add(new Bird(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
+            case PINKSTAR -> birds.add(new Pinkstar(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
             case MUSHROOM -> mushs.add(new Mushroom(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
             case 100 -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
         }
@@ -143,7 +143,7 @@ public class Level {
         return cannons;
     }
 
-    public ArrayList<Bird> getBirds() {
+    public ArrayList<Pinkstar> getPinkstar() {
         return birds;
     }
 

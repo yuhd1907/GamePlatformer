@@ -8,17 +8,16 @@ import static utilz.Constants.Directions.*;
 
 import gamestates.Playing;
 
-public class Bird extends Enemy {
+public class Pinkstar extends Enemy {
 
     private boolean preRoll = true;
     private int tickSinceLastDmgToPlayer;
     private int tickAfterRollInIdle;
     private int rollDurationTick, rollDuration = 300;
 
-    public Bird(float x, float y) {
-        super(x, y, BIRD_WIDTH, BIRD_HEIGHT, BIRD);
-        initHitbox(37, 28);
-        initAttackBox(37, 28, 30);
+    public Pinkstar(float x, float y) {
+        super(x, y, PINKSTAR_WIDTH, PINKSTAR_HEIGHT, PINKSTAR);
+        initHitbox(17, 21);
     }
 
     public void update(int[][] lvlData, Playing playing) {
@@ -35,27 +34,32 @@ public class Bird extends Enemy {
         else {
             switch (state) {
                 case IDLE:
-                    if (IsFloor(hitbox, lvlData))
-                        newState(RUNNING);
-                    else
-                        inAir = true;
+                    preRoll = true;
+                    if (tickAfterRollInIdle >= 120) {
+                        if (IsFloor(hitbox, lvlData))
+                            newState(RUNNING);
+                        else
+                            inAir = true;
+                        tickAfterRollInIdle = 0;
+                        tickSinceLastDmgToPlayer = 60;
+                    } else
+                        tickAfterRollInIdle++;
                     break;
                 case RUNNING:
                     if (canSeePlayer(lvlData, playing.getPlayer())) {
-                        turnTowardsPlayer(playing.getPlayer());
-                        if (isPlayerCloseForAttack(playing.getPlayer()))
-                            newState(ATTACK);
+                        newState(ATTACK);
+                        setWalkDir(playing.getPlayer());
                     }
-
-                    move(lvlData);
+                    move(lvlData, playing);
                     break;
                 case ATTACK:
-                    if (aniIndex == 0)
-                        attackChecked = false;
-                    else if (aniIndex == 6) {
-                        if (!attackChecked)
-                            checkPlayerHit(attackBox, playing.getPlayer());
-                        attackMove(lvlData, playing);
+                    if (preRoll) {
+                        if (aniIndex >= 3)
+                            preRoll = false;
+                    } else {
+                        move(lvlData, playing);
+                        checkDmgToPlayer(playing.getPlayer());
+                        checkRollOver(playing);
                     }
                     break;
                 case HIT:
@@ -67,23 +71,6 @@ public class Bird extends Enemy {
                     break;
             }
         }
-    }
-
-    protected void attackMove(int[][] lvlData, Playing playing) {
-        float xSpeed = 0;
-
-        if (walkDir == LEFT)
-            xSpeed = -walkSpeed;
-        else
-            xSpeed = walkSpeed;
-
-        if (CanMoveHere(hitbox.x + xSpeed * 4, hitbox.y, hitbox.width, hitbox.height, lvlData))
-            if (IsFloor(hitbox, xSpeed * 4, lvlData)) {
-                hitbox.x += xSpeed * 4;
-                return;
-            }
-        newState(IDLE);
-        playing.addDialogue((int) hitbox.x, (int) hitbox.y, EXCLAMATION);
     }
 
     private void checkDmgToPlayer(Player player) {

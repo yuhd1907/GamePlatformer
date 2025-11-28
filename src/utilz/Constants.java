@@ -133,7 +133,7 @@ public class Constants {
 
     public static class EnemyConstants {
         public static final int GOBLIN = 0;
-        public static final int BIRD = 1;
+        public static final int PINKSTAR = 1;
         public static final int MUSHROOM = 2;
 
         public static final int IDLE = 0;
@@ -149,12 +149,12 @@ public class Constants {
         public static final int GOBLIN_DRAWOFFSET_X = (int) (63 * Game.SCALE);
         public static final int GOBLIN_DRAWOFFSET_Y = (int) (69 * Game.SCALE);
 
-        public static final int BIRD_WIDTH_DEFAULT = 150;
-        public static final int BIRD_HEIGHT_DEFAULT = 150;
-        public static final int BIRD_WIDTH = (int) (BIRD_WIDTH_DEFAULT * Game.SCALE);
-        public static final int BIRD_HEIGHT = (int) (BIRD_HEIGHT_DEFAULT * Game.SCALE);
-        public static final int BIRD_DRAWOFFSET_X = (int) (58 * Game.SCALE);
-        public static final int BIRD_DRAWOFFSET_Y = (int) (69 * Game.SCALE);
+        public static final int PINKSTAR_WIDTH_DEFAULT = 34;
+        public static final int PINKSTAR_HEIGHT_DEFAULT = 30;
+        public static final int PINKSTAR_WIDTH = (int) (PINKSTAR_WIDTH_DEFAULT * Game.SCALE);
+        public static final int PINKSTAR_HEIGHT = (int) (PINKSTAR_HEIGHT_DEFAULT * Game.SCALE);
+        public static final int PINKSTAR_DRAWOFFSET_X = (int) (9 * Game.SCALE);
+        public static final int PINKSTAR_DRAWOFFSET_Y = (int) (7 * Game.SCALE);
 
         public static final int MUSHROOM_WIDTH_DEFAULT = 150;
         public static final int MUSHROOM_HEIGHT_DEFAULT = 150;
@@ -166,16 +166,20 @@ public class Constants {
         public static int GetSpriteAmount(int enemy_type, int enemy_state) {
             switch (enemy_state) {
 
-                case IDLE: {
-                    if (enemy_type == GOBLIN || enemy_type == MUSHROOM)
-                        return 4;
+                case IDLE:
                     return 8;
-                }
                 case RUNNING:
+                    if (enemy_type == PINKSTAR)
+                        return 6;
+                    return 8;
                 case ATTACK:
+                    if (enemy_type == PINKSTAR)
+                        return 7;
                     return 8;
                 case HIT:
                 case DEAD:
+                    if (enemy_type == PINKSTAR)
+                        return 5;
                     return 4;
             }
 
@@ -187,7 +191,7 @@ public class Constants {
             switch (enemy_type) {
                 case GOBLIN:
                     return 50;
-                case BIRD, MUSHROOM:
+                case PINKSTAR, MUSHROOM:
                     return 25;
                 default:
                     return 1;
@@ -198,7 +202,7 @@ public class Constants {
             switch (enemy_type) {
                 case GOBLIN:
                     return 15;
-                case BIRD:
+                case PINKSTAR:
                     return 20;
                 case MUSHROOM:
                     return 25;

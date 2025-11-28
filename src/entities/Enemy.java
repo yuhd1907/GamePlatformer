@@ -166,7 +166,7 @@ public abstract class Enemy extends Entity {
                         case ATTACK, HIT -> state = IDLE;
                         case DEAD -> active = false;
                     }
-                } else if (enemyType == BIRD) {
+                } else if (enemyType == PINKSTAR) {
                     if (state == ATTACK)
                         aniIndex = 3;
                     else {
