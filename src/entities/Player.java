@@ -72,7 +72,6 @@ public class Player extends Entity {
         
         initHitbox(playerCharacter.hitboxW, playerCharacter.hitboxH);
         
-        // Khởi tạo AttackBox
         attackBox = new Rectangle2D.Float(x, y, playerCharacter.attackBoxW, playerCharacter.attackBoxH);
     }
 
@@ -84,7 +83,6 @@ public class Player extends Entity {
     }
 
     private void initAttackBox() {
-        // Để trống
     }
 
     public void update() {
@@ -121,16 +119,18 @@ public class Player extends Entity {
         updateAttackBox();
 
         if (state == HIT) {
-			float pushBackSpeed = 1.25f; 
-			if (playerCharacter == PlayerCharacter.WOMAN) {
-				pushBackSpeed = 0.3f; 
-			}
-			if (aniIndex <= playerCharacter.getSpriteAmount(state) - 3)
-				pushBack(pushBackDir, lvlData, pushBackSpeed);
-			
-			updatePushBackDrawOffset();
-		} else
-			updatePos();
+            // Woman bị đẩy lùi nhẹ hơn (hoặc đứng im) khi trúng đòn
+            float pushBackSpeed = 1.25f;
+            if (playerCharacter == PlayerCharacter.WOMAN) {
+                pushBackSpeed = 0.3f;
+            }
+
+            if (aniIndex <= playerCharacter.getSpriteAmount(state) - 3)
+                pushBack(pushBackDir, lvlData, pushBackSpeed);
+            
+            updatePushBackDrawOffset();
+        } else
+            updatePos();
 
         if (moving) {
             checkPotionTouched();
@@ -158,7 +158,7 @@ public class Player extends Entity {
         int attackAnimIndex = 1; 
 
         if (playerCharacter == PlayerCharacter.THOR) {
-            attackAnimIndex = 3; // Thor đánh ở frame thứ 4
+            attackAnimIndex = 3; 
         }
 
         if (attackChecked || aniIndex != attackAnimIndex)
@@ -217,8 +217,11 @@ public class Player extends Entity {
     }
 
     private void updateAttackBox() {
-        // Fix điểm mù: Lùi AttackBox vào trong người một chút (Overlap)
+        // Fix điểm mù cho Woman (lùi sâu hơn vì kiếm ngắn)
         int overlap = (int) (Game.SCALE * 5); 
+        if (playerCharacter == PlayerCharacter.WOMAN) {
+            overlap = (int) (Game.SCALE * 15);
+        }
 
         if (right || (powerAttackActive && flipW == 1)) {
             attackBox.x = hitbox.x + hitbox.width - overlap;
@@ -245,10 +248,6 @@ public class Player extends Entity {
     public void render(Graphics g, int lvlOffset) {
         g.drawImage(animations[playerCharacter.getRowIndex(state)][aniIndex], (int) (hitbox.x - playerCharacter.xDrawOffset) - lvlOffset + flipX, (int) (hitbox.y - playerCharacter.yDrawOffset + (int) (pushDrawOffset)), width * flipW, height, null);
         drawHitbox(g, lvlOffset);
-        
-        // Vẽ AttackBox (Uncomment để debug nếu cần)
-        // drawAttackBox(g, lvlOffset);
-        
         drawArrows(g, lvlOffset);
         drawUI(g);
     }
@@ -265,7 +264,6 @@ public class Player extends Entity {
         aniTick++;
         
         int speed = ANI_SPEED;
-        // Tăng tốc độ đánh cho Thor (số càng nhỏ càng nhanh)
         if (playerCharacter == PlayerCharacter.THOR && state == ATTACK) {
             speed = 15; 
         }
@@ -323,7 +321,7 @@ public class Player extends Entity {
         if (jump) jump();
         if (!inAir) if (!powerAttackActive) 
             if ((!left && !right) || (right && left)) 
-                if (!attacking) return; // Fix lỗi đứng yên không bắn được
+                if (!attacking) return; 
 
         float xSpeed = 0;
         if (left && !right) {
@@ -383,11 +381,11 @@ public class Player extends Entity {
         }
     }
 
-    // --- HÀM GIẢM SÁT THƯƠNG CHO WOMAN ---
+    // --- ĐÃ SỬA: WOMAN NHẬN 50% SÁT THƯƠNG ---
     public void changeHealth(int value) {
         if (value < 0) {
             if (playerCharacter == PlayerCharacter.WOMAN) {
-                value = value / 2; // Giảm 50% sát thương
+                value = value / 2;
             }
             if (state == HIT) return;
             else newState(HIT);
